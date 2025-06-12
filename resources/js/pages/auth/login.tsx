@@ -9,6 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/auth-layout';
+import { FcGoogle } from 'react-icons/fc'; // Google icon
 
 type LoginForm = {
     email: string;
@@ -39,7 +40,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
         <AuthLayout title="Log in to your account" description="Enter your email and password below to log in">
             <Head title="Log in" />
 
-            <form className="flex flex-col gap-6" onSubmit={submit}>
+            <form className="flex flex-col gap-6 shadow p-4" onSubmit={submit}>
                 <div className="grid gap-6">
                     <div className="grid gap-2">
                         <Label htmlFor="email">Email address</Label>
@@ -93,6 +94,14 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                     <Button type="submit" className="mt-4 w-full" tabIndex={4} disabled={processing}>
                         {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
                         Log in
+                    </Button>
+                </div>
+                <div className="text-center text-sm text-muted-foreground">
+                    <Button asChild type="button" className="w-full" tabIndex={5}>
+                        <a href={route('auth.google')}>
+                            <FcGoogle className="mr-2 h-5 w-5" />
+                            Login with Google
+                        </a>
                     </Button>
                 </div>
 
