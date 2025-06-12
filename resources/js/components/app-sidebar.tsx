@@ -15,7 +15,7 @@ const mainNavItems: NavItem[] = [
     },
     {
         title: 'Note Managements',
-        href: '/note-managements',
+        href: '/notes',
         icon: ClipboardCheckIcon,
     },
 ];
