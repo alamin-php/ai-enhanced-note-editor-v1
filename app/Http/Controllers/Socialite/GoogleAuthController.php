@@ -18,31 +18,36 @@ class GoogleAuthController extends Controller
     public function verify()
     {
 
-        $googleUser = Socialite::driver('google')->user();
-        $user = User::where('email', $googleUser->email)->first();
+        try {
+            $googleUser = Socialite::driver('google')->user();
+            $user = User::where('email', $googleUser->email)->first();
 
-        if ($user) {
-            $user->update([
-                'google_id' => $googleUser->id,
-                'name' => $googleUser->name,
-                'google_token' => $googleUser->token,
-                'google_refresh_token' => $googleUser->refreshToken,
-                'google_avatar' => $googleUser->avatar,
-            ]);
-        } else {
-            $user = User::create([
-                'google_id' => $googleUser->id,
-                'name' => $googleUser->name,
-                'email' => $googleUser->email,
-                'google_token' => $googleUser->token,
-                'google_refresh_token' => $googleUser->refreshToken,
-                'google_avatar' => $googleUser->avatar,
-                'password' => $this->randomPassword()
-            ]);
+            if ($user) {
+                $user->update([
+                    'google_id' => $googleUser->id,
+                    'name' => $googleUser->name,
+                    'google_token' => $googleUser->token,
+                    'google_refresh_token' => $googleUser->refreshToken,
+                    'google_avatar' => $googleUser->avatar,
+                ]);
+            } else {
+                $user = User::create([
+                    'google_id' => $googleUser->id,
+                    'name' => $googleUser->name,
+                    'email' => $googleUser->email,
+                    'google_token' => $googleUser->token,
+                    'google_refresh_token' => $googleUser->refreshToken,
+                    'google_avatar' => $googleUser->avatar,
+                    'password' => $this->randomPassword()
+                ]);
+            }
+
+            Auth::login($user);
+            return redirect('/dashboard');
+        } catch (\Exception $e) {
+            return redirect('/login');
         }
 
-        Auth::login($user);
-        return redirect('/dashboard');
     }
 
 
