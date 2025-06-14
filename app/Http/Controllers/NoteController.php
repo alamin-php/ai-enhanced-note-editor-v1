@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Note;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Auth;
+
 
 class NoteController extends Controller
 {
@@ -13,7 +15,16 @@ class NoteController extends Controller
      */
     public function index()
     {
-        return Inertia::render('notes/notes');
+        $notes = Note::where('user_id', Auth::id())->get()->map(function ($note) {
+            return [
+                'id' => $note->id,
+                'title' => $note->title ?? 'Untitled Note',
+                'date' => $note->updated_at->format('M d, Y'),
+                'content' => $note->content,
+            ];
+        });
+
+        return Inertia::render('notes/notes', compact('notes'));
     }
 
     /**
@@ -59,8 +70,13 @@ class NoteController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Note $note)
+    public function destroy($noteId)
     {
-        //
+
+        Note::where('id', $noteId)->delete();
+
+        // Redirect back to notes index with a success message
+        return redirect()->route('my-notes.index')->with('success', 'Note deleted successfully.');
     }
+
 }
