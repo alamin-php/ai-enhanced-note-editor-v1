@@ -49,24 +49,22 @@ export default function NoteManagement() {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="My Notes" />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-                {filteredNotes.length > 0 && (
-                    <div className="flex items-center justify-between">
-                        <input
-                            type="search"
-                            placeholder="Search notes..."
-                            className="w-full max-w-md rounded-md border border-gray-300 px-4 py-2 text-sm placeholder-gray-400 transition focus:border-black focus:ring-1 focus:ring-black focus:outline-none"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                        />
+                <div className="flex items-center justify-between">
+                    <input
+                        type="search"
+                        placeholder="Search notes..."
+                        className="w-full max-w-md rounded-md border border-gray-300 px-4 py-2 text-sm placeholder-gray-400 transition focus:border-black focus:ring-1 focus:ring-black focus:outline-none"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
 
-                        <Link href={route('my-notes.create')}>
-                            <Button variant="outline" className="cursor-pointer text-sm">
-                                <PlusIcon className="h-5 w-5 text-primary" />
-                                New Note
-                            </Button>
-                        </Link>
-                    </div>
-                )}
+                    <Link href={route('my-notes.create')}>
+                        <Button variant="outline" className="cursor-pointer text-sm">
+                            <PlusIcon className="h-5 w-5 text-primary" />
+                            New Note
+                        </Button>
+                    </Link>
+                </div>
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                     {filteredNotes.length === 0 ? (
@@ -82,33 +80,41 @@ export default function NoteManagement() {
                         </div>
                     ) : (
                         filteredNotes.map((note) => (
-                            <Card key={note.id}>
-                                <CardHeader className="flex flex-row items-center justify-between">
-                                    <div>
-                                        <CardTitle>{note.title}</CardTitle>
-                                        <CardDescription>{note.date}</CardDescription>
-                                    </div>
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                            <button className="cursor-pointer rounded-full p-2 hover:bg-gray-100">
-                                                <MoreVertical className="h-5 w-5" />
-                                            </button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end">
-                                            <DropdownMenuItem
-                                                onClick={() => handleDelete(note.id)}
-                                                className="group flex cursor-pointer items-center gap-2 text-red-500 hover:text-black focus:text-black"
-                                            >
-                                                <Trash2 className="h-4 w-4 text-red-500 group-hover:text-black group-focus:text-black" />
-                                                Delete
-                                            </DropdownMenuItem>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
-                                </CardHeader>
-                                <CardContent>
-                                    <p className="text-sm text-gray-500">{note.content}</p>
-                                </CardContent>
-                            </Card>
+                            <Link href={route('my-notes.edit', note.id)} className="block">
+                                <Card key={note.id} className="cursor-pointer transition hover:shadow-md">
+                                    <CardHeader className="flex flex-row items-center justify-between">
+                                        <div>
+                                            <CardTitle>{note.title}</CardTitle>
+                                            <CardDescription>{note.date}</CardDescription>
+                                        </div>
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <button
+                                                    className="cursor-pointer rounded-full p-2 hover:bg-gray-100"
+                                                    onClick={(e) => e.stopPropagation()} // Stop Link navigation
+                                                >
+                                                    <MoreVertical className="h-5 w-5" />
+                                                </button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end">
+                                                <DropdownMenuItem
+                                                    onClick={(e) => {
+                                                        e.stopPropagation(); // Prevent Link click
+                                                        handleDelete(note.id);
+                                                    }}
+                                                    className="group flex cursor-pointer items-center gap-2 text-red-500 hover:text-black focus:text-black"
+                                                >
+                                                    <Trash2 className="h-4 w-4 text-red-500 group-hover:text-black group-focus:text-black" />
+                                                    Delete
+                                                </DropdownMenuItem>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <p className="text-sm text-gray-500">{note.content}</p>
+                                    </CardContent>
+                                </Card>
+                            </Link>
                         ))
                     )}
                 </div>
