@@ -1,12 +1,13 @@
-import { Card, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
+import { Sparkles, Undo2Icon } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Note Managements',
+        title: 'My Notes',
         href: '/notes',
     },
 ];
@@ -14,27 +15,38 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function NoteManagement() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Note Managements" />
+            <Head title="Create Note" />
             <div className="flex h-full flex-1 flex-col gap-4 overflow-x-auto rounded-xl p-4">
-                <div className="flex justify-end">
-                    <Link
-                        href={route('notes.index')}
-                        className="inline-block rounded bg-black px-4 py-2 text-sm font-medium text-white transition-colors duration-200"
-                    >
-                        Back
+                <div className="flex justify-end gap-2">
+                    <Link href={route('my-notes.index')}>
+                        <Button variant="outline" className="cursor-po cursor-pointer text-sm">
+                            <Undo2Icon className="h-5 w-5 text-primary" />
+                            Notes
+                        </Button>
                     </Link>
+                    <Button variant="outline" className="cursor-po cursor-pointer text-sm">
+                        <Sparkles className="h-5 w-5 text-primary" />
+                        <span className="font-medium">AI Enhanced Editor</span>
+                    </Button>
                 </div>
 
-                <Card className="p-2">
-                    <CardHeader>
-                        <CardTitle>Login to your account</CardTitle>
+                <Card>
+                    <CardHeader className="flex flex-col gap-1">
+                        <input
+                            type="text"
+                            defaultValue="Untitled Note"
+                            placeholder="Enter note title"
+                            className="w-full border-b border-gray-300 pb-1 text-lg font-semibold focus:ring-0 focus:outline-none"
+                        />
                     </CardHeader>
-                    <Label htmlFor="groupName">Group Name</Label>
-                    <input
-                        type="text"
-                        placeholder='Enter note title'
-                        className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-800 shadow-xs focus:ring-0 focus:outline-none"
-                    />
+                    <CardContent>
+                        <textarea
+                            rows={6}
+                            placeholder="Start typing your note here..."
+                            className="w-full resize-y rounded-md border border-gray-300 px-3 py-2 text-sm leading-relaxed transition focus:border-gray-300 focus:ring-0 focus:outline-none"
+                            spellCheck={true}
+                        />
+                    </CardContent>
                 </Card>
             </div>
         </AppLayout>

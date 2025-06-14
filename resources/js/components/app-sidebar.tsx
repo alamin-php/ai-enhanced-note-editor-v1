@@ -14,8 +14,8 @@ const mainNavItems: NavItem[] = [
         icon: LayoutGrid,
     },
     {
-        title: 'Note Managements',
-        href: '/notes',
+        title: 'My Notes',
+        href: '/my-notes',
         icon: ClipboardCheckIcon,
     },
 ];
