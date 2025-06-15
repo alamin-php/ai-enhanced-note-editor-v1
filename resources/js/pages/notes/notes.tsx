@@ -111,7 +111,7 @@ export default function NoteManagement() {
                                         </DropdownMenu>
                                     </CardHeader>
                                     <CardContent>
-                                        <p className="text-sm text-gray-500">{note.content}</p>
+                                        <p className="text-sm text-gray-500">{note.content.substring(0, 90)}{note.content.length > 90 ? '...' : ''}</p>
                                     </CardContent>
                                 </Card>
                             </Link>
