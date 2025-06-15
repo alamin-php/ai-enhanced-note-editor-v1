@@ -61,7 +61,8 @@ php artisan serve
 Open your browser:
 
 ```
-http://127.0.0.1:8000
+Local Server: http://127.0.0.1:8000
+Live Project: https://notes.advancesoftbd.com
 ```
 
 ## 6. Optional: Build for Production
@@ -72,7 +73,7 @@ php artisan optimize:clear
 php artisan config:cache
 ```
 
-## 6. Note: Extra featurs for RAW PHP code
+## 7. Note: Extra featurs for RAW PHP code
 
 ```bash
 Added raw code php featurs for Export Notes.
