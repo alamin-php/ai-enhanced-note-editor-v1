@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\NoteBackupController;
 use App\Http\Controllers\NoteController;
 use App\Http\Controllers\Socialite\GoogleAuthController;
 use Illuminate\Support\Facades\Route;
@@ -15,6 +16,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 Route::get('/google/redirect', [GoogleAuthController::class, 'index'])->name('auth.google');
 Route::get('/google/callback', [GoogleAuthController::class, 'verify'])->name('auth.google.verify');
+
+Route::get('/notes/export-text-raw', [NoteBackupController::class, 'exportTextRaw'])->name('notes.export-text-raw');
 
 
 require __DIR__.'/settings.php';
