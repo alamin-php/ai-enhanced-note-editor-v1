@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm } from '@inertiajs/react';
@@ -95,48 +95,55 @@ export default function CreateOrEditNote({ note }: Props) {
 
         const prompt = `Generate relevant comma-separated tags for this note:\n\n${data.content}`;
 
-        const stream = await openai.chat.completions.create({
-            model: 'gpt-4.1-nano-2025-04-14',
-            messages: [{ role: 'user', content: prompt }],
-            stream: true,
-        });
+        setData('content', data.content + '\n\nTags: '); // initialize tags area
 
-        let finalOutput = '';
-        for await (const chunk of stream) {
-            const content = chunk.choices[0]?.delta?.content;
-            if (content) {
-                finalOutput += content;
-            }
-        }
-
-        // Append generated tags to existing note content
-        const newContent = `${data.content}\n\nTags: ${finalOutput}`;
-        setData('content', newContent);
-
-        // Immediately manually save (because auto-save may miss this programmatic change)
-        if (data.id) {
-            put(route('my-notes.update', data.id), {
-                preserveScroll: true,
-                preserveState: true,
-                onSuccess: () => {
-                    console.log('AI Tags auto-saved (updated)');
-                    lastSavedData.current = { title: data.title, content: newContent };
-                },
-                onError: () => console.error('AI Tags auto-save update failed'),
+        try {
+            const stream = await openai.chat.completions.create({
+                model: 'gpt-4.1-nano-2025-04-14',
+                messages: [{ role: 'user', content: prompt }],
+                stream: true,
             });
-        } else {
-            post(route('my-notes.store'), {
-                preserveScroll: true,
-                preserveState: true,
-                onSuccess: (res) => {
-                    console.log('AI Tags auto-saved (created)');
-                    if (res.props?.note?.id) {
-                        setData('id', res.props.note.id);
+
+            let streamedOutput = '';
+
+            for await (const chunk of stream) {
+                const content = chunk.choices[0]?.delta?.content;
+                if (content) {
+                    // Typing animation: append characters one by one with delay
+                    for (let i = 0; i < content.length; i++) {
+                        streamedOutput += content[i];
+                        setData('content', data.content + '\n\nTags: ' + streamedOutput);
+
+                        // Delay 20ms per character
+                        await new Promise((resolve) => setTimeout(resolve, 20));
                     }
-                    lastSavedData.current = { title: data.title, content: newContent };
-                },
-                onError: () => console.error('AI Tags auto-save create failed'),
-            });
+                }
+            }
+
+            const newContent = data.content + '\n\nTags: ' + streamedOutput;
+
+            if (data.id) {
+                put(route('my-notes.update', data.id), {
+                    preserveScroll: true,
+                    preserveState: true,
+                    onSuccess: () => {
+                        lastSavedData.current = { title: data.title, content: newContent };
+                    },
+                });
+            } else {
+                post(route('my-notes.store'), {
+                    preserveScroll: true,
+                    preserveState: true,
+                    onSuccess: (res) => {
+                        if (res.props?.note?.id) {
+                            setData('id', res.props.note.id);
+                        }
+                        lastSavedData.current = { title: data.title, content: newContent };
+                    },
+                });
+            }
+        } catch (error) {
+            console.error('Streaming AI failed:', error);
         }
 
         setAiLoading(false);
@@ -153,12 +160,7 @@ export default function CreateOrEditNote({ note }: Props) {
                             Notes
                         </Button>
                     </Link>
-                    <Button
-                        variant="outline"
-                        className="cursor-pointer text-sm"
-                        onClick={runAiEnhancement}
-                        disabled={isDisabled || aiLoading}
-                    >
+                    <Button variant="outline" className="cursor-pointer text-sm" onClick={runAiEnhancement} disabled={isDisabled || aiLoading}>
                         <Sparkles className="h-5 w-5 text-primary" />
                         <span className="font-medium">{aiLoading ? 'Generating...' : 'Generate Tags'}</span>
                     </Button>
@@ -183,8 +185,19 @@ export default function CreateOrEditNote({ note }: Props) {
                             className="w-full resize-y rounded-md border border-gray-300 px-3 py-2 text-sm leading-relaxed transition focus:border-gray-300 focus:ring-0 focus:outline-none"
                             spellCheck={true}
                         />
-                        {saving && <p className="mt-1 text-sm text-gray-500">Saving...</p>}
                     </CardContent>
+                    <CardFooter>
+                        {saving ? (
+                            <p className="text-sm text-gray-400">Saving...</p>
+                        ) : aiLoading ? (
+                            <p className="text-sm text-gray-500">
+                                Generating AI Tags
+                                <span className="ml-2 animate-pulse text-gray-500">|</span>
+                            </p>
+                        ) : (
+                            <p className="text-sm text-gray-400">Ready</p>
+                        )}
+                    </CardFooter>
                 </Card>
             </div>
         </AppLayout>
